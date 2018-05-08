@@ -24,11 +24,6 @@
         </select>
 
 
-        <div>
-            <br> You selected action => {{actionList[selectedAction]}}
-            <br>
-            <br>
-        </div>
 
         <div>
             <chart options="chartOptions">Placeholder for generic chart</chart>
@@ -79,10 +74,9 @@
                 $scope.updateChart = function (actionIndex) {
 
 
-                    console.log($scope.dataArray[actionIndex]);
-                    console.log($scope.headers);
-                    console.log();
 
+                    let categories = $scope.headers;
+                    console.log($scope.headers);
                     $scope.chartOptions = {
                         title: {
                             text: 'API Response Graph '
@@ -91,7 +85,7 @@
                             text: $scope.dataArray[actionIndex][0]
                         },
                         xAxis: {
-                            categories: $scope.headers.splice(2),
+                            categories: categories.slice(2),
                             title: {
                                 text: '<b>Load Percentage</b>'
                             }
@@ -113,8 +107,15 @@
                                 text: '<b>Response Time</b>'
                             }
                         },
+                        tooltip: {
+                            formatter: function () {
+                                return 'Response time at <b>' + this.x + '</b> is <b>' + this.y + ' millisec </b>';
+                            }
+                        },
                         series: [{
-                            data: $scope.dataArray[actionIndex].splice(2).map(Number)
+                            data: $scope.dataArray[actionIndex].splice(2).map(Number),
+                            name: 'Response Time',
+                            showInLegend: false
                         }]
                     };
                 };
