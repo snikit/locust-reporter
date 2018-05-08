@@ -1,0 +1,13 @@
+"Method","Name","# requests","# failures","Median response time","Average response time","Min response time","Max response time","Average Content Size","Requests/s"
+"GET","/users/ashish.jaiswal@siemens.com/productGroups/default",4,0,480,537,448,668,1149,0.43
+"GET","/users/ashish.jaiswal@siemens.com/products/additionallinks",1,0,360,363,363,363,0,0.11
+"DELETE","/users/ashish.jaiswal@siemens.com/products/favorites",1,0,300,297,297,297,0,0.11
+"PUT","/users/ashish.jaiswal@siemens.com/products/favorites",2,0,450,446,445,447,0,0.21
+"GET","/users/ashish.jaiswal@siemens.com/products/recents",1,0,420,420,420,420,624,0.11
+"GET","/users/kedar.joshi@siemens.com/productGroups/default",3,0,1500,1426,526,2274,4679,0.32
+"GET","/users/kedar.joshi@siemens.com/products/additionallinks",1,0,1600,1601,1601,1601,0,0.11
+"DELETE","/users/kedar.joshi@siemens.com/products/favorites",1,0,280,281,281,281,0,0.11
+"PUT","/users/kedar.joshi@siemens.com/products/favorites",2,0,450,1005,447,1564,0,0.21
+"GET","/users/kedar.joshi@siemens.com/products/recents",1,0,500,496,496,496,1874,0.11
+"GET","/v2/api-docs",2,0,290,1245,292,2199,10635,0.21
+"None","Total",19,0,480,804,281,2274,2231,2.02

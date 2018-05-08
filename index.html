@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html ng-app="locust-reporter" ng-controller="mainCtrl">
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            padding: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 10px;
+        }
+    </style>
+
+    <body>
+
+        <p>
+            Select an Action:</p>
+
+        <select ng-model="selectedAction" ng-change="actionSelected()">
+            <option ng-repeat="x in actionList" value="{{$index}}">{{x}}</option>
+        </select>
+
+
+        <div>
+            <br> You selected action => {{actionList[selectedAction]}}
+            <br>
+            <br>
+        </div>
+
+        <div>
+            <chart options="chartOptions">Placeholder for generic chart</chart>
+        </div>
+
+
+
+        <div id="divID">
+            <table>
+                <tr ng-repeat="x in data  track by $index">
+                    <td ng-repeat="y in x  track by $index">{{ y }}</td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <table>
+            </table>
+        </div>
+        <script src="./js/angular.min.js"></script>
+        <script src="./js/angular-charts.min.js"></script>
+        <script>
+            // ].replace(new RegExp('"', 'g'), ''));
+
+
+
+
+
+
+
+
+            function mainCtrl($scope, $http) {
+
+                $scope.chartOptions = {
+                    title: {
+                        text: 'Temperature data'
+                    },
+                    xAxis: {
+                        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                    },
+
+                    series: [{
+                        data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+                    }]
+                };
+
+
+                $scope.updateChart = function (actionIndex) {
+
+
+                    console.log($scope.dataArray[actionIndex]);
+                    console.log($scope.headers);
+                    console.log();
+
+                    $scope.chartOptions = {
+                        title: {
+                            text: 'API Response Graph '
+                        },
+                        subtitle: {
+                            text: $scope.dataArray[actionIndex][0]
+                        },
+                        xAxis: {
+                            categories: $scope.headers.splice(2),
+                            title: {
+                                text: '<b>Load Percentage</b>'
+                            }
+                        },
+                        plotOptions: {
+                            line: {
+                                dataLabels: {
+                                    enabled: true
+                                }
+                            }
+                        },
+                        yAxis: {
+                            labels: {
+                                formatter: function () {
+                                    return this.value + ' millisec';
+                                }
+                            },
+                            title: {
+                                text: '<b>Response Time</b>'
+                            }
+                        },
+                        series: [{
+                            data: $scope.dataArray[actionIndex].splice(2).map(Number)
+                        }]
+                    };
+                };
+
+                var dataArray = [];
+
+                $scope.readCSV = function () {
+                    // http get request to read CSV file content
+                    $http.get('./oppo_distribution.csv').then(function (data) {
+                        $scope.processData(data.data)
+                    }, function (err) {
+                        console.log(err);
+                    })
+                };
+
+                var nameMethodArray = [];
+
+                $scope.processData = function (allText) {
+                    dataArray = [];
+
+                    allText = allText.replace(new RegExp('"', 'g'), '')
+
+                    var allTextLines = allText.split(/\r\n|\n/);
+                    var headers = allTextLines[0].split(',');
+                    for (var i = 1; i < allTextLines.length - 1; i++) {
+
+                        var data = allTextLines[i].split(',');
+
+                        nameMethodArray.push(data[0]);
+
+
+                        dataArray.push(data);
+                    }
+
+                    $scope.actionList = nameMethodArray;
+                    $scope.headers = headers;
+                    $scope.selectedAction = '0';
+                    $scope.dataArray = dataArray;
+
+                    $scope.updateChart($scope.selectedAction);
+
+                    // split content based on new line
+                    var allTextLines = allText.split(/\r\n|\n/);
+                    var headers = allTextLines[0].split(',');
+                    var lines = [];
+
+                    for (var i = 0; i < allTextLines.length; i++) {
+                        // split content based on comma
+                        var data = allTextLines[i].split(',');
+                        if (data.length == headers.length) {
+                            var tarr = [];
+                            for (var j = 0; j < headers.length; j++) {
+                                tarr.push(data[j]);
+                            }
+                            lines.push(tarr);
+                        }
+                    }
+                    $scope.data = lines;
+                };
+
+                $scope.actionSelected = function () {
+                    console.log('you have selected action => ' + $scope.actionList[$scope.selectedAction]);
+                    $scope.updateChart($scope.selectedAction);
+                }
+
+                $scope.readCSV();
+            }
+
+            var app = angular.module("locust-reporter", []);
+            app.controller("mainCtrl", mainCtrl);
+            app.directive('chart', function () {
+                return {
+                    restrict: 'E',
+                    template: '<div ></div>',
+                    scope: {
+                        options: '='
+                    },
+                    controller: function ($scope, $element) {
+                        $scope.$watch('options', function (value) {
+                            Highcharts.chart($element[0], $scope.options);
+                        });
+                    }
+                };
+            })
+        </script>
+    </body>
+
+</html>

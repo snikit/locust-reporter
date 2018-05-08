@@ -1,0 +1,13 @@
+"Name","# requests","50%","66%","75%","80%","90%","95%","98%","99%","100%"
+"GET /users/ashish.jaiswal@siemens.com/productGroups/default",4,560,560,670,670,670,670,670,670,668
+"GET /users/ashish.jaiswal@siemens.com/products/additionallinks",1,360,360,360,360,360,360,360,360,363
+"DELETE /users/ashish.jaiswal@siemens.com/products/favorites",1,300,300,300,300,300,300,300,300,297
+"PUT /users/ashish.jaiswal@siemens.com/products/favorites",2,450,450,450,450,450,450,450,450,447
+"GET /users/ashish.jaiswal@siemens.com/products/recents",1,420,420,420,420,420,420,420,420,420
+"GET /users/kedar.joshi@siemens.com/productGroups/default",3,1500,1500,2300,2300,2300,2300,2300,2300,2274
+"GET /users/kedar.joshi@siemens.com/products/additionallinks",1,1600,1600,1600,1600,1600,1600,1600,1600,1601
+"DELETE /users/kedar.joshi@siemens.com/products/favorites",1,280,280,280,280,280,280,280,280,281
+"PUT /users/kedar.joshi@siemens.com/products/favorites",2,1600,1600,1600,1600,1600,1600,1600,1600,1564
+"GET /users/kedar.joshi@siemens.com/products/recents",1,500,500,500,500,500,500,500,500,496
+"GET /v2/api-docs",2,2200,2200,2200,2200,2200,2200,2200,2200,2199
+"None Total",19,480,560,1500,1600,2200,2300,2300,2300,2274
