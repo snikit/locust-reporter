@@ -179,21 +179,25 @@
 
                     $http.get('./meta.json').then(function (data) {
                         $scope.meta = data.data;
+
+
+                        $http.get('./' + $scope.meta.distributionFile + '.csv').then(function (data) {
+                            $scope.processData(data.data)
+                        }, function (err) {
+                            console.log(err);
+                        })
+
+                        $http.get('./' + $scope.meta.requestsDataFile + '.csv').then(function (data) {
+                            $scope.processRequestsData(data.data, true)
+                        }, function (err) {
+                            console.log(err);
+                        })
+
                     }, function (err) {
                         console.log(err);
                     })
 
-                    $http.get('./oppo_distribution.csv').then(function (data) {
-                        $scope.processData(data.data)
-                    }, function (err) {
-                        console.log(err);
-                    })
 
-                    $http.get('./load_requests.csv').then(function (data) {
-                        $scope.processRequestsData(data.data, true)
-                    }, function (err) {
-                        console.log(err);
-                    })
 
                 };
 
