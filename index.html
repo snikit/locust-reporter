@@ -1,46 +1,80 @@
 <!DOCTYPE html>
 <html ng-app="locust-reporter" ng-controller="mainCtrl">
-    <style>
-        table,
-        th,
-        td {
-            border: 1px solid black;
-            padding: 5px;
-        }
 
-        table {
-            border-collapse: collapse;
-            margin: 10px;
-        }
-    </style>
+    <head>
+
+        <link rel="stylesheet" href="./w3.css">
+
+        <style>
+            table,
+            th,
+            td {
+                border: 1px solid black;
+                padding: 5px;
+            }
+
+            table {
+                border-collapse: collapse;
+                margin: 10px;
+            }
+
+            select {
+                font-weight: bold;
+            }
+
+            select option {
+                margin: 5px;
+                padding: 5px;
+                font-weight: bold;
+            }
+        </style>
+    </head>
 
     <body>
 
-        <p>
-            Select an Action:</p>
-
-        <select ng-model="selectedAction" ng-change="actionSelected()">
-            <option ng-repeat="x in actionList" value="{{$index}}">{{x}}</option>
-        </select>
-
-
-
-        <div>
-            <chart options="chartOptions">Placeholder for generic chart</chart>
+        <div class="w3-panel ">
+            <p class="s3-serif w3-xxlarge">
+                Load Testing Report : {{:: meta.service}} - {{:: meta.date | date : 'medium'}}
+            </p>
         </div>
 
+        <div class="w3-row">
+            <div class=" w3-col m6 s12">
+                <div class="w3-container ">
+                    <select class="w3-select w3-border" ng-model="selectedAction" ng-change="actionSelected()">
+                        <option ng-repeat="x in actionList | orderBy : 'value'" value="{{x.index}}">{{x.value}}</option>
+                    </select>
+                </div>
+                <div class="w3-container ">
+                    <chart options="chartOptions">Placeholder for generic chart</chart>
+                </div>
 
-
-        <div id="divID">
-            <table>
-                <tr ng-repeat="x in data  track by $index">
-                    <td ng-repeat="y in x  track by $index">{{ y }}</td>
-                </tr>
-            </table>
-        </div>
-        <div>
-            <table>
-            </table>
+                <div>
+                    <table class="w3-table-all w3-hoverable w3-card-1">
+                        <tr>
+                            <th>Total Requests</th>
+                            <th ng-class="{'w3-red' : requestDataArray[selectedAction][3] > 0}">Failure</th>
+                            <th>Average Response Time</th>
+                            <th>Min Response Time</th>
+                            <th>Max Response Time</th>
+                            <th>Average Content Size</th>
+                            <th>Requests/s</th>
+                        </tr>
+                        <tr>
+                            <td>{{requestDataArray[selectedAction][2]}}</td>
+                            <td ng-class="{'w3-red' : requestDataArray[selectedAction][3] > 0}">{{requestDataArray[selectedAction][3]}}</td>
+                            <td>{{requestDataArray[selectedAction][5]}} millisec</td>
+                            <td>{{requestDataArray[selectedAction][6]}} millisec</td>
+                            <td>{{requestDataArray[selectedAction][7]}} millisec</td>
+                            <td>{{requestDataArray[selectedAction][8]}} bytes</td>
+                            <td>{{requestDataArray[selectedAction][9]}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="w3-col m2 ">
+                &nbsp;
+            </div>
         </div>
         <script src="./js/angular.min.js"></script>
         <script src="./js/angular-charts.min.js"></script>
@@ -73,21 +107,25 @@
 
                 $scope.updateChart = function (actionIndex) {
 
-
-
                     let categories = $scope.headers;
-                    console.log($scope.headers);
+                    let xVals = $scope.dataArray[actionIndex];
+
                     $scope.chartOptions = {
                         title: {
-                            text: 'API Response Graph '
-                        },
-                        subtitle: {
-                            text: $scope.dataArray[actionIndex][0]
+                            text: 'API Response Graph ',
+                            style: {
+                                color: '#000',
+                                font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                            }
                         },
                         xAxis: {
                             categories: categories.slice(2),
                             title: {
-                                text: '<b>Load Percentage</b>'
+                                text: '<b>Load Percentage</b>',
+                                style: {
+                                    color: '#000',
+                                    font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                                }
                             }
                         },
                         plotOptions: {
@@ -104,7 +142,20 @@
                                 }
                             },
                             title: {
-                                text: '<b>Response Time</b>'
+                                text: '<b>Response Time</b>',
+                                style: {
+                                    color: '#000',
+                                    font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                                }
+                            }
+                        },
+                        legend: {
+                            itemStyle: {
+                                font: '9pt Trebuchet MS, Verdana, sans-serif',
+                                color: 'black'
+                            },
+                            itemHoverStyle: {
+                                color: 'gray'
                             }
                         },
                         tooltip: {
@@ -113,7 +164,7 @@
                             }
                         },
                         series: [{
-                            data: $scope.dataArray[actionIndex].splice(2).map(Number),
+                            data: xVals.slice(2).map(Number),
                             name: 'Response Time',
                             showInLegend: false
                         }]
@@ -121,17 +172,46 @@
                 };
 
                 var dataArray = [];
+                var requestDataArray = [];
+                var nameMethodArray = [];
 
                 $scope.readCSV = function () {
-                    // http get request to read CSV file content
+
+                    $http.get('./meta.json').then(function (data) {
+                        $scope.meta = data.data;
+                    }, function (err) {
+                        console.log(err);
+                    })
+
                     $http.get('./oppo_distribution.csv').then(function (data) {
                         $scope.processData(data.data)
                     }, function (err) {
                         console.log(err);
                     })
+
+                    $http.get('./load_requests.csv').then(function (data) {
+                        $scope.processRequestsData(data.data, true)
+                    }, function (err) {
+                        console.log(err);
+                    })
+
                 };
 
-                var nameMethodArray = [];
+
+
+                $scope.processRequestsData = function (allText, requestCsv) {
+                    requestDataArray = [];
+                    allText = allText.replace(new RegExp('"', 'g'), '')
+                    var allTextLines = allText.split(/\r\n|\n/);
+                    var headers = allTextLines[0].split(',');
+                    for (var i = 1; i < allTextLines.length - 1; i++) {
+                        var data = allTextLines[i].split(',');
+                        requestDataArray.push(data);
+                    }
+
+                    $scope.requestDataArray = requestDataArray;
+                }
+
 
                 $scope.processData = function (allText) {
                     dataArray = [];
@@ -144,9 +224,7 @@
 
                         var data = allTextLines[i].split(',');
 
-                        nameMethodArray.push(data[0]);
-
-
+                        nameMethodArray.push({ index: i - 1, value: data[0] });
                         dataArray.push(data);
                     }
 
@@ -177,7 +255,7 @@
                 };
 
                 $scope.actionSelected = function () {
-                    console.log('you have selected action => ' + $scope.actionList[$scope.selectedAction]);
+                    console.log('you have selected action => ' + $scope.actionList[$scope.selectedAction].value);
                     $scope.updateChart($scope.selectedAction);
                 }
 
